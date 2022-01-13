@@ -2,6 +2,9 @@ package xyz.bumbing.api.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+import java.time.Instant;
 
 @Getter
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
@@ -21,8 +24,6 @@ public enum ErrorCode {
     EMAIL_DUPLICATION(409, "M001", "Email is Duplication"),
 
     LOGIN_INPUT_INVALID(400, "M002", "Login input is invalid");
-
-    // Exercise
 
 
     private final String code;

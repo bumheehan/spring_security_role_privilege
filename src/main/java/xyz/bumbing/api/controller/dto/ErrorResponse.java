@@ -1,7 +1,7 @@
 package xyz.bumbing.api.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import xyz.bumbing.auth.api.exception.ErrorCode;
+import xyz.bumbing.api.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

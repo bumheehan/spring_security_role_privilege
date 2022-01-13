@@ -1,4 +1,4 @@
-package xyz.bumbing.security;
+package xyz.bumbing.api.security;
 
 import lombok.Getter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

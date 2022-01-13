@@ -1,9 +1,9 @@
 package xyz.bumbing.api.controller;
 
 
-import xyz.bumbing.auth.api.controller.dto.LoginResponse;
-import xyz.bumbing.auth.api.controller.dto.MedicalStaffResponse;
-import xyz.bumbing.auth.api.controller.dto.Response;
+import xyz.bumbing.api.controller.dto.LoginResponse;
+import xyz.bumbing.api.controller.dto.Response;
+import xyz.bumbing.api.controller.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -15,9 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 @Slf4j
 public class UserController implements UserApi {
+
     @Override
-    public Response<MedicalStaffResponse.V1> createMedicalStaff(CreateUserRequest createMedicalStaffRequest) {
-        return Response.ok(new MedicalStaffResponse.V1("testName"));
+    public Response<UserResponse.V1> create(CreateUserRequest createUserRequest) {
+        return null;
+    }
+
+    @Override
+    public Response<UserResponse.V1> update(Long id, UpdateUserRequest updateUserRequest) {
+        return null;
     }
 
     @Override

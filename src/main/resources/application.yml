@@ -19,6 +19,35 @@ spring:
     console:
       enabled: true
 
+springdoc:
+  version: '@springdoc.version@'
+  swagger-ui:
+    display-request-duration: true
+    path: /swagger-ui.html
+    #    configUrl: /v3/api-docs/swagger-config
+    disable-swagger-default-url: true
+    try-it-out-enabled: true
+    #    url: /apidocs/v11
+    tagsSorter: alpha
+    operationsSorter: alpha
+    use-root-path: true
+    enabled: true
+  pathsToMatch: #list, url 매핑 목록
+    - /api/**
+  api-docs:
+    path: /apidocs/v1 #Json Format url
+    enabled: true
+  model-converters:
+    pageable-converter:
+      enabled: true
+
+app:
+  token:
+    access-secret: abcdefghijklabcdefghijklabcdefghijklabcdefghijkl
+    access-expired: 1800
+    refresh-secret: abcdefghijklabcdefghijklabcdefghijklabcdefghijkl
+    refresh-expired: 604800
+
 
 # Register P6LogFactory to log JDBC events
 decorator.datasource.p6spy.enable-logging: true

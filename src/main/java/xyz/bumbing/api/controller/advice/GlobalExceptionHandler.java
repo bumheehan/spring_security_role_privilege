@@ -1,8 +1,5 @@
 package xyz.bumbing.api.controller.advice;
 
-import xyz.bumbing.auth.api.controller.dto.ErrorResponse;
-import xyz.bumbing.auth.api.exception.ErrorCode;
-import xyz.bumbing.auth.api.exception.MoraException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +10,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import xyz.bumbing.api.controller.dto.ErrorResponse;
+import xyz.bumbing.api.exception.ErrorCode;
+import xyz.bumbing.api.exception.UserException;
 
 import java.nio.file.AccessDeniedException;
+
 
 
 @RestControllerAdvice
@@ -79,8 +80,8 @@ public class GlobalExceptionHandler {
     /**
      * Mora Service  핸들링
      */
-    @ExceptionHandler(MoraException.class)
-    protected ResponseEntity<ErrorResponse> handleMoraException(final MoraException e) {
+    @ExceptionHandler(UserException.class)
+    protected ResponseEntity<ErrorResponse> handleMoraException(final UserException e) {
         log.error("Business Exception", e);
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())

@@ -1,9 +1,9 @@
-package xyz.bumbing.security.config;
+package xyz.bumbing.api.config;
 
-import xyz.bumbing.security.CustomAccessDeniedHandler;
-import xyz.bumbing.security.CustomAuthenticationEntryPoint;
-import xyz.bumbing.security.JwtAuthenticationFilter;
-import xyz.bumbing.security.JwtUtils;
+import xyz.bumbing.api.security.CustomAccessDeniedHandler;
+import xyz.bumbing.api.security.CustomAuthenticationEntryPoint;
+import xyz.bumbing.api.security.JwtAuthenticationFilter;
+import xyz.bumbing.api.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

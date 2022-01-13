@@ -1,6 +1,6 @@
-package xyz.bumbing.security;
+package xyz.bumbing.api.security;
 
-import xyz.bumbing.security.type.JwtType;
+import xyz.bumbing.api.security.type.JwtType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

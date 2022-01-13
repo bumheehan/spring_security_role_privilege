@@ -1,4 +1,4 @@
-package xyz.bumbing.security;
+package xyz.bumbing.api.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

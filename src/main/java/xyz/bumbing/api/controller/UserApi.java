@@ -29,9 +29,9 @@ public interface UserApi {
     @Operation(summary = "회원가입", tags = {"User"})
     Response<UserResponse.V1> create(@RequestBody @Valid UserApi.CreateUserRequest createUserRequest);
 
-    @PutMapping
+    @PutMapping("/{id}")
     @Operation(summary = "회원수정", tags = {"User"})
-    Response<UserResponse.V1> update(@RequestBody @Valid UserApi.UpdateUserRequest updateUserRequest);
+    Response<UserResponse.V1> update( @PathVariable Long id ,@RequestBody @Valid UserApi.UpdateUserRequest updateUserRequest);
 
     @DeleteMapping("/{id}")
     @Operation(summary = "회원탈퇴", tags = {"User"})

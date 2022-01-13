@@ -28,8 +28,8 @@ public class Role {
 
 
     //== 비지니스 ==//
-    public void appendPrivilege(Privilege privilege){
-        if(!validateDuplicationPrivilege(privilege)){
+    public void addPrivilege(Privilege privilege){
+        if(!validatePrivilegeDuplication(privilege)){
             RolePrivilege rolePrivilege = RolePrivilege.builder().role(this).privilege(privilege).build();
             rolePrivileges.add(rolePrivilege);
             privilege.getRolePrivileges().add(rolePrivilege);
@@ -38,7 +38,7 @@ public class Role {
     public void removePrivilege(Privilege privilege){
         rolePrivileges.removeIf(s -> s.getRole().getId().equals(this.id) && s.getPrivilege().getId().equals(privilege.getId()));
     }
-    private boolean validateDuplicationPrivilege(Privilege privilege){
+    private boolean validatePrivilegeDuplication(Privilege privilege){
         return rolePrivileges.stream().anyMatch(s -> s.getRole().getId().equals(this.id) && s.getPrivilege().getId().equals(privilege.getId()));
     }
 }

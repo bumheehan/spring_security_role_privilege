@@ -1,4 +1,4 @@
-package xyz.bumbing.security;
+package xyz.bumbing.api.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -6,13 +6,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import xyz.bumbing.security.dto.SingleTokenDto;
-import xyz.bumbing.security.type.JwtType;
+import lombok.RequiredArgsConstructor;
+import xyz.bumbing.api.config.AppTokenConfig;
+import xyz.bumbing.api.security.dto.SingleTokenDto;
+import xyz.bumbing.api.security.type.JwtType;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
@@ -20,21 +23,21 @@ import java.util.Map;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class JwtUtils {
-    private final Key accessKey;
-    private final Key refreshKey;
-    private final Long accessExpiresIn;
-    private final Long refreshExpireIn;
+    private Key accessKey;
+    private Key refreshKey;
+    private Long accessExpiresIn;
+    private Long refreshExpireIn;
 
-    public JwtUtils(@Value("${mora.token.access.secret}") String accessSecretKey,
-                    @Value("${mora.token.refresh.secret}") String refreshSecretKey,
-                    @Value("${mora.token.access.expired:1800}") String accessExpired,
-                    @Value("${mora.token.refresh.expired:604800}") String refreshExpired) {
+    private final AppTokenConfig appTokenConfig;
 
-        this.accessKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessSecretKey));
-        this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretKey));
-        this.accessExpiresIn = Long.parseLong(accessExpired);
-        this.refreshExpireIn = Long.parseLong(refreshExpired);
+    @PostConstruct
+    private void init(){
+        this.accessKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(appTokenConfig.getAccessSecret()));
+        this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(appTokenConfig.getRefreshSecret()));
+        this.accessExpiresIn = appTokenConfig.getAccessExpired();
+        this.refreshExpireIn = appTokenConfig.getRefreshExpired();
     }
 
     public TokenValidDto validateToken(String token, JwtType tokenType) {

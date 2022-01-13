@@ -1,4 +1,4 @@
-package xyz.bumbing.security.dto;
+package xyz.bumbing.api.security.dto;
 
 import lombok.Data;
 

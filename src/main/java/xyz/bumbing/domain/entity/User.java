@@ -66,7 +66,7 @@ public class User extends Base {
         this.password = password;
     }
 
-    public void appendRole(Role role){
+    public void addRole(Role role){
         if(!validateDuplicationRole(role)){
             UserRole userRole = UserRole.builder().user(this).role(role).build();
             userRoles.add(userRole);

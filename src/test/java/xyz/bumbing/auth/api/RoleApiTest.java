@@ -25,38 +25,38 @@ class RoleApiTest {
     }
 
     @Test
-    @DisplayName("회원 가입")
-    public void create() throws Exception {
+    @DisplayName("Role 추가")
+    public void createRole() {
 
     }
 
     @Test
-    @DisplayName("회원 수정")
-    public void update() {
+    @DisplayName("Role 수정")
+    public void updateRole() {
 
     }
 
     @Test
-    @DisplayName("회원 비활성화")
-    public void disable() {
+    @DisplayName("Role 삭제")
+    public void deleteRole() {
 
     }
 
     @Test
-    @DisplayName("회원 활성화")
-    public void enable() {
+    @DisplayName("Privilege  추가")
+    public void createPrivilege() {
 
     }
 
     @Test
-    @DisplayName("회원 로그인")
-    public void login() {
+    @DisplayName("Privilege 수정")
+    public void updatePrivilege() {
 
     }
 
     @Test
-    @DisplayName("리프레시 토큰 로그인")
-    public void loginRefresh() {
+    @DisplayName("Privilege 삭제")
+    public void deletePrivilege() {
 
     }
 
