@@ -12,7 +12,9 @@ public class Response<T> {
 
     public Response(T data, Object message) {
         this.data = data;
-        this.message = message.toString();
+        if(message!=null){
+            this.message = message.toString();
+        }
     }
 
     public Response(T data) {
