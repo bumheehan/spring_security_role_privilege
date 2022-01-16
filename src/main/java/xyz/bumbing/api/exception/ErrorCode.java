@@ -17,13 +17,11 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "C004", "Server Error"),
     INVALID_TYPE_VALUE(400, "C005", " Invalid Type Value"),
     HANDLE_ACCESS_DENIED(403, "C006", "Access is Denied"),
-
     HANDLE_NO_AUTHENTICATION(401, "C007", "No Authentication"),
-
-    // Member
     EMAIL_DUPLICATION(409, "M001", "Email is Duplication"),
+    LOGIN_INPUT_INVALID(400, "M002", "Login input is invalid"),
 
-    LOGIN_INPUT_INVALID(400, "M002", "Login input is invalid");
+    DUPLICATION(409, "C008", "Object is Duplication");
 
 
     private final String code;

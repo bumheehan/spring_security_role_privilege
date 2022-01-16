@@ -2,6 +2,7 @@ package xyz.bumbing.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.bumbing.api.service.PrivilegeService;
 import xyz.bumbing.domain.dto.PrivilegeDto;
 import xyz.bumbing.domain.entity.Privilege;
@@ -12,11 +13,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PrivilegeServiceImp implements PrivilegeService {
+@Transactional(readOnly = true)
+public class PrivilegeServiceImpl implements PrivilegeService {
 
     private final PrivilegeRepository privilegeRepository;
 
     @Override
+    @Transactional
     public PrivilegeDto create(String name) {
 
         Privilege privilege = privilegeRepository.findByName(name).orElseGet(() -> Privilege.builder().name(name).build());
@@ -27,6 +30,7 @@ public class PrivilegeServiceImp implements PrivilegeService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
 
         privilegeRepository.deleteById(id);
