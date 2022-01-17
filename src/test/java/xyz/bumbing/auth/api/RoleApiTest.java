@@ -40,7 +40,6 @@ class RoleApiTest {
     public void createPrivilege() throws Exception {
         //given
         String privilege = "READ_BOARD";
-
         PrivilegeApi.CreatePrivilegeRequest createPrivilegeRequest = new PrivilegeApi.CreatePrivilegeRequest();
         createPrivilegeRequest.setName(privilege);
         //when
@@ -48,8 +47,8 @@ class RoleApiTest {
         webClient.post().uri("/api/privilege").bodyValue(createPrivilegeRequest)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<Response<PrivilegeDto>>() {
-                }).consumeWith(s -> {
+                .expectBody(new ParameterizedTypeReference<Response<PrivilegeDto>>() {})
+                .consumeWith(s -> {
                     assertEquals(privilege, s.getResponseBody().getData().getName());
                 });
     }

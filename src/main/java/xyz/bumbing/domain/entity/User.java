@@ -9,8 +9,8 @@ import xyz.bumbing.domain.type.MemberStatusType;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -18,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends Base {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -48,8 +48,6 @@ public class User extends Base {
     private Login login;
 
     //== 생성 메서드 == //
-
-
     public static User createUser(UserDto.CreateUserDto createUserDto) {
         Address address = Address.builder()
                 .zipCode(createUserDto.getAddress().getZipCode())
@@ -78,24 +76,39 @@ public class User extends Base {
         user.address = address;
         user.password = updateUserDto.getPassword();
     }
+
     //== 비지니스 로직 ==//
 
-
+    //== 연관관계 편의 메서드 ==//
     public void addRole(Role role) {
-        if (!validateDuplicationRole(role)) {
-            UserRole userRole = UserRole.builder().user(this).role(role).build();
+        if (findUserRole(role).isEmpty()) {
+            UserRole userRole = UserRole.builder().role(role).user(this).build();
             userRoles.add(userRole);
             role.getUserRole().add(userRole);
         }
     }
 
     public void removeRole(Role role) {
-        userRoles.removeIf(s -> s.getUser().getId().equals(this.id) && s.getRole().getId().equals(role.getId()));
+        Optional<UserRole> userRoleOptional = findUserRole(role);
+        if(userRoleOptional.isPresent()){
+            UserRole userRole = userRoleOptional.get();
+            role.getUserRole().remove(userRole); // role table
+            userRole.removeRelationship(); // mapping table
+            userRoles.remove(userRole); // user table
+        }
     }
 
-    private boolean validateDuplicationRole(Role role) {
-        return userRoles.stream().anyMatch(s -> s.getUser().getId().equals(this.id) && s.getRole().getId().equals(role.getId()));
+    public void replacePrivilege(Collection<Role> roles) {
+        Set<UserRole> newList = roles.stream().map(s -> findUserRole(s).orElse(null)).filter(Objects::nonNull).collect(Collectors.toSet());
+        userRoles.clear();
+        userRoles.addAll(newList);
+        roles.forEach(this::addRole);
     }
+
+    private Optional<UserRole> findUserRole(Role role) {
+        return userRoles.stream().filter(s -> s.getUser().getId().equals(this.id) &&  s.getRole().getId().equals(role.getId())).findAny();
+    }
+
 
     public void disable() {
         this.status = MemberStatusType.N;

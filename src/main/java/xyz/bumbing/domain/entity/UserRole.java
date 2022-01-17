@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class UserRole {
  
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -31,5 +31,10 @@ public class UserRole {
         this.role = role;
     }
 
+    //== 연관관계 ==//
+    public void removeRelationship(){
+        this.user = null;
+        this.role = null;
+    }
 
 }

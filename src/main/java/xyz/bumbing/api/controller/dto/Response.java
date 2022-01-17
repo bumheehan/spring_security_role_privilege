@@ -28,5 +28,8 @@ public class Response<T> {
     public static <T> Response<T> ok(T data) {
         return new Response<>(data);
     }
+    public static Response<Void> ok() {
+        return new Response<>(null);
+    }
 
 }

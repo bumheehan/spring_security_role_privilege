@@ -20,11 +20,11 @@ public class Role {
 
     private String name;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
     private final Set<RolePrivilege> rolePrivileges = new HashSet<>();
 
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     private final Set<UserRole> userRole = new HashSet<>();
 
 
@@ -33,6 +33,7 @@ public class Role {
     Role(String name) {
         this.name = name;
     }
+
 
     //== 비지니스 ==//
     public void addPrivilege(Privilege privilege) {
@@ -57,6 +58,7 @@ public class Role {
         rolePrivileges.addAll(newList);
         privileges.forEach(this::addPrivilege);
     }
+
 
     private Optional<RolePrivilege> findRolePrivilege(Privilege privilege) {
         return rolePrivileges.stream().filter(s -> s.getRole().getId().equals(this.id) && s.getPrivilege().getId().equals(privilege.getId())).findAny();

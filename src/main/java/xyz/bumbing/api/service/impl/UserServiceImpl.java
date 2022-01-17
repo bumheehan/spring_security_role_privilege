@@ -10,8 +10,11 @@ import xyz.bumbing.api.service.UserService;
 import xyz.bumbing.domain.dto.UserDto;
 import xyz.bumbing.domain.entity.Role;
 import xyz.bumbing.domain.entity.User;
+import xyz.bumbing.domain.entity.UserRole;
 import xyz.bumbing.domain.repo.RoleRepository;
 import xyz.bumbing.domain.repo.UserRepository;
+
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true) // 모든 메소드 기본적용
@@ -41,7 +44,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateUser(String email) {
-        userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("email 존재"));
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isPresent()){
+            throw new UserException(ErrorCode.DUPLICATION);
+        }
     }
 
     @Override
@@ -67,6 +73,30 @@ public class UserServiceImpl implements UserService {
     public UserDto getUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserException(ErrorCode.ENTITY_NOT_FOUND));
         return UserDto.of(user);
+    }
+
+    @Override
+    @Transactional
+    public void addRole(Long id, String roleName) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserException(ErrorCode.ENTITY_NOT_FOUND));
+        Role role = roleRepository.findByName(roleName).orElseThrow(() -> new UserException(ErrorCode.ENTITY_NOT_FOUND));
+        user.addRole(role);
+    }
+
+    @Override
+    @Transactional
+    public void removeRole(Long id, String roleName) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserException(ErrorCode.ENTITY_NOT_FOUND));
+        Role role = roleRepository.findByName(roleName).orElseThrow(() -> new UserException(ErrorCode.ENTITY_NOT_FOUND));
+//        user.removeRole(role);
+//        Optional<UserRole> userRoleOptional = user.getUserRoles().stream().filter(s -> s.getUser().getId().equals(user.getId()) && s.getRole().getId().equals(role.getId())).findAny();
+//        if(userRoleOptional.isPresent()){
+//            UserRole userRole = userRoleOptional.get();
+//            role.getUserRole().remove(userRole); // role table
+//            userRole.removeRelationship(); // mapping table
+//            user.getUserRoles().remove(userRole); // user table
+//        }
+        user.getUserRoles().clear();
     }
 
 //

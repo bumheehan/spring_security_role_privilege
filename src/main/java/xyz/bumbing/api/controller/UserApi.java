@@ -11,6 +11,7 @@ import xyz.bumbing.api.controller.dto.LoginResponse;
 import xyz.bumbing.api.controller.dto.Response;
 import xyz.bumbing.api.controller.dto.UserResponse;
 import xyz.bumbing.domain.dto.AddressDto;
+import xyz.bumbing.domain.dto.UserDto;
 import xyz.bumbing.domain.type.GenderType;
 import xyz.bumbing.domain.type.MemberStatusType;
 
@@ -27,15 +28,20 @@ public interface UserApi {
 
     @PostMapping
     @Operation(summary = "회원가입", tags = {"User"})
-    Response<UserResponse.V1> create(@RequestBody @Valid UserApi.CreateUserRequest createUserRequest);
+    Response<UserDto> create(@RequestBody @Valid UserApi.CreateUserRequest createUserRequest);
 
     @PutMapping("/{id}")
     @Operation(summary = "회원수정", tags = {"User"})
-    Response<UserResponse.V1> update( @PathVariable Long id ,@RequestBody @Valid UserApi.UpdateUserRequest updateUserRequest);
+    Response<UserDto> update( @PathVariable Long id ,@RequestBody @Valid UserApi.UpdateUserRequest updateUserRequest);
 
     @DeleteMapping("/{id}")
     @Operation(summary = "회원탈퇴", tags = {"User"})
-    Response<String> deleteMedicalStaff(@PathVariable Long id);
+    Response<Void> withdraw(@PathVariable Long id);
+
+    @GetMapping("/{id}")
+    @Operation(summary = "회원정보", tags = {"User"})
+    Response<UserDto> getUser(@PathVariable Long id);
+
 
     @PostMapping("/login")
     @Operation(summary = "로그인", tags = {"User"})
@@ -80,6 +86,7 @@ public interface UserApi {
         @Schema(example = "900101")
         private  LocalDate birthDay;
 
+
     }
     @Data
     @Schema
@@ -89,18 +96,6 @@ public interface UserApi {
         @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\]^_`{|}~\\\\])(?=.*[0-9])[0-9A-Za-z!\"#$%&'()*+,\\-./:;<=>?@\\[\\]^_`{|}~\\\\]{8,16}$", message = "1002")
         private String password;
 
-        @Schema
-        @NotBlank
-        private  String name;
-
-        @Schema
-        @Email
-        private  String email;
-
-        @Schema
-        @Pattern(regexp = "[0-9]{3}-[0-9]{3,4}-[0-9]{4}")
-        private  String phone;
-
         @Schema(example = "12345")
         private String zipCode;
 
@@ -109,12 +104,6 @@ public interface UserApi {
 
         @Schema(example = "101호")
         private String address2;
-
-        @Schema(example = "M")
-        private  GenderType gender;
-
-        @Schema(example = "900101")
-        private  LocalDate birthDay;
 
     }
     @Data

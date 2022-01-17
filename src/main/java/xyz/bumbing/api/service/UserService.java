@@ -11,4 +11,8 @@ public interface UserService {
     void withdraw(Long id);
 
     UserDto getUser(Long id);
+
+    void addRole(Long id,String role);
+
+    void removeRole(Long id, String role);
 }

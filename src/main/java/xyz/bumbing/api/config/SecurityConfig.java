@@ -35,11 +35,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
 
-
         httpSecurity
                 .cors().and()
                 .csrf().disable()
                 .formLogin().disable()
+                .headers().frameOptions().disable().and() // h2-console 사용안할때 제거
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //세션을 사용하지 않겠다고 선언
                 .and()
@@ -48,7 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterAt(new JwtAuthenticationFilter(this.jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/api/member/test2").authenticated()
-                .antMatchers("/").permitAll();
+                .antMatchers("/**").permitAll()
+                .antMatchers("/h2-console/**").permitAll();
 
     }
 }
