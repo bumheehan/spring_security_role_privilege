@@ -6,55 +6,60 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Role {
- 
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    @OneToMany(mappedBy = "role",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private final List<RolePrivilege> rolePrivileges = new ArrayList<>();
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private final Set<RolePrivilege> rolePrivileges = new HashSet<>();
 
 
-    @OneToMany(mappedBy = "role",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private final List<UserRole> userRole = new ArrayList<>();
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private final Set<UserRole> userRole = new HashSet<>();
 
 
     //== 생성 ==//
     @Builder
-    Role(String name){
-        this.name= name;
+    Role(String name) {
+        this.name = name;
     }
 
     //== 비지니스 ==//
-    public void addPrivilege(Privilege privilege){
-        if(!validatePrivilegeDuplication(privilege)){
+    public void addPrivilege(Privilege privilege) {
+        if (findRolePrivilege(privilege).isEmpty()) {
             RolePrivilege rolePrivilege = RolePrivilege.builder().role(this).privilege(privilege).build();
             rolePrivileges.add(rolePrivilege);
             privilege.getRolePrivileges().add(rolePrivilege);
         }
     }
-    public void removePrivilege(Privilege privilege){
-        rolePrivileges.removeIf(s -> s.getRole().getId().equals(this.id) && s.getPrivilege().getId().equals(privilege.getId()));
+
+    public void removePrivilege(Privilege privilege) {
+        Optional<RolePrivilege> rolePrivilegeOptional = findRolePrivilege(privilege);
+        rolePrivilegeOptional.ifPresent(s -> {
+            s.removeRole();
+            rolePrivileges.remove(s);
+        });
     }
 
-    public void removePrivileges(){
-        for(RolePrivilege rolePrivilege : new ArrayList<>(rolePrivileges)){
-            removePrivilege(rolePrivilege.getPrivilege());
-        }
+    public void replacePrivilege(Collection<Privilege> privileges) {
+        Set<RolePrivilege> newList = privileges.stream().map(s -> findRolePrivilege(s).orElse(null)).filter(Objects::nonNull).collect(Collectors.toSet());
+        rolePrivileges.clear();
+        rolePrivileges.addAll(newList);
+        privileges.forEach(this::addPrivilege);
     }
 
-
-    private boolean validatePrivilegeDuplication(Privilege privilege){
-        return rolePrivileges.stream().anyMatch(s -> s.getRole().getId().equals(this.id) && s.getPrivilege().getId().equals(privilege.getId()));
+    private Optional<RolePrivilege> findRolePrivilege(Privilege privilege) {
+        return rolePrivileges.stream().filter(s -> s.getRole().getId().equals(this.id) && s.getPrivilege().getId().equals(privilege.getId())).findAny();
     }
 }
+

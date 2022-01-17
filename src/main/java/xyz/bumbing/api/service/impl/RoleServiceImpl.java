@@ -37,7 +37,7 @@ public class RoleServiceImpl implements RoleService {
         Role role = Role.builder().name(name).build();
         roleRepository.save(role);
 
-        privileges.stream().forEach(role::addPrivilege);
+        privileges.forEach(role::addPrivilege);
 
         return RoleDto.of(role);
     }
@@ -47,9 +47,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleDto update(Long id, List<Long> privilegeIds) {
         Role role = roleRepository.findById(id).orElseThrow(() -> new UserException(ErrorCode.ENTITY_NOT_FOUND));
         List<Privilege> privileges = privilegeRepository.findAllById(privilegeIds);
-
-        role.removePrivileges();
-        privileges.stream().forEach(role::addPrivilege);
+        role.replacePrivilege(privileges);
         return RoleDto.of(role);
     }
 

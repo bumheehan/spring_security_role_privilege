@@ -1,10 +1,14 @@
 package xyz.bumbing.api.service;
 
-import xyz.bumbing.api.service.dto.CreateUserDto;
 import xyz.bumbing.domain.dto.UserDto;
 
 public interface UserService {
 
-    public UserDto signIn(CreateUserDto createUserDto);
+    UserDto create(UserDto.CreateUserDto createUserDto);
 
+    UserDto update(Long id, UserDto.UpdateUserDto updateUserDto);
+
+    void withdraw(Long id);
+
+    UserDto getUser(Long id);
 }

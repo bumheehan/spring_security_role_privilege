@@ -11,9 +11,9 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RolePrivilege {
- 
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,11 +22,15 @@ public class RolePrivilege {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
-    private Role role ;
+    private Role role;
 
     @Builder
     public RolePrivilege(Privilege privilege, Role role) {
         this.privilege = privilege;
         this.role = role;
+    }
+
+    public void removeRole() {
+        role = null;
     }
 }

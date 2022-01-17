@@ -1,5 +1,8 @@
 package xyz.bumbing.api.config;
 
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import xyz.bumbing.api.security.CustomAccessDeniedHandler;
 import xyz.bumbing.api.security.CustomAuthenticationEntryPoint;
 import xyz.bumbing.api.security.JwtAuthenticationFilter;
@@ -49,3 +52,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 }
+

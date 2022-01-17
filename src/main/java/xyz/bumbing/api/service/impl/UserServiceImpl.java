@@ -1,26 +1,17 @@
 package xyz.bumbing.api.service.impl;//package kr.co.everex.mora.auth.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import xyz.bumbing.domain.entity.Address;
-import xyz.bumbing.domain.entity.Role;
-import xyz.bumbing.domain.entity.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.bumbing.api.exception.ErrorCode;
 import xyz.bumbing.api.exception.UserException;
 import xyz.bumbing.api.service.UserService;
-import xyz.bumbing.api.service.dto.CreateUserDto;
 import xyz.bumbing.domain.dto.UserDto;
+import xyz.bumbing.domain.entity.Role;
+import xyz.bumbing.domain.entity.User;
 import xyz.bumbing.domain.repo.RoleRepository;
 import xyz.bumbing.domain.repo.UserRepository;
-import xyz.bumbing.domain.type.MemberStatusType;
-import xyz.bumbing.api.security.dto.SingleTokenDto;
-import xyz.bumbing.api.security.type.JwtType;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true) // 모든 메소드 기본적용
@@ -29,25 +20,53 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
-    public UserDto signIn(CreateUserDto createUserDto) {
+    public UserDto create(UserDto.CreateUserDto createUserDto) {
 
         validateUser(createUserDto.getEmail());
 
-        User user = CreateUserDto.changeUser(createUserDto);
+        createUserDto.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
+
+        User user = User.createUser(createUserDto);
 
         userRepository.save(user);
 
-        Role userRole = roleRepository.findByName("ROLE_USER").orElseThrow(()->new IllegalStateException("Not Found ROLE_USER"));
+        Role userRole = roleRepository.findByName("ROLE_USER").orElseThrow(() -> new IllegalStateException("Not Found ROLE_USER"));
         user.addRole(userRole);
 
         return UserDto.of(user);
     }
 
-    private void validateUser(String email){
-        userRepository.findByEmail(email).orElseThrow(()->new IllegalArgumentException("email 존재"));
+    private void validateUser(String email) {
+        userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("email 존재"));
+    }
+
+    @Override
+    @Transactional
+    public UserDto update(Long id, UserDto.UpdateUserDto updateUserDto) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserException(ErrorCode.ENTITY_NOT_FOUND));
+
+        updateUserDto.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
+
+        user.updateUser(updateUserDto);
+
+        return UserDto.of(user);
+    }
+
+    @Override
+    @Transactional
+    public void withdraw(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserException(ErrorCode.ENTITY_NOT_FOUND));
+        user.disable();
+    }
+
+    @Override
+    public UserDto getUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserException(ErrorCode.ENTITY_NOT_FOUND));
+        return UserDto.of(user);
     }
 
 //

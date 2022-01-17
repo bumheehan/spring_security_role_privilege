@@ -12,12 +12,12 @@ public class UserException extends RuntimeException {
     }
 
     public UserException(ErrorCode errorCode) {
-        super();
+        super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 
     public UserException(ErrorCode errorCode, Throwable cause) {
-        super(null, cause);
+        super(errorCode.getMessage(), cause);
         this.errorCode = errorCode;
     }
 

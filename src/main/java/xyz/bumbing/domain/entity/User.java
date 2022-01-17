@@ -1,16 +1,16 @@
 package xyz.bumbing.domain.entity;
 
-import lombok.Builder;
-import xyz.bumbing.domain.type.GenderType;
-import xyz.bumbing.domain.type.MemberStatusType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import xyz.bumbing.domain.dto.UserDto;
+import xyz.bumbing.domain.type.GenderType;
+import xyz.bumbing.domain.type.MemberStatusType;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -41,42 +41,59 @@ public class User extends Base {
     @Column
     private LocalDate birthDay;
 
-    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
-    private final List<UserRole> userRoles = new ArrayList<>();
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private final Set<UserRole> userRoles = new HashSet<>();
 
-    @OneToOne(mappedBy = "user",orphanRemoval = true,cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Login login;
 
     //== 생성 메서드 == //
 
-    @Builder
-    public User(String name, String email, String password, String phone, MemberStatusType status, Address address, GenderType gender, LocalDate birthDay) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.status = status;
-        this.address = address;
-        this.gender = gender;
-        this.birthDay = birthDay;
+
+    public static User createUser(UserDto.CreateUserDto createUserDto) {
+        Address address = Address.builder()
+                .zipCode(createUserDto.getAddress().getZipCode())
+                .address1(createUserDto.getAddress().getAddress1())
+                .address2(createUserDto.getAddress().getAddress2())
+                .build();
+        User user = new User();
+        user.name = createUserDto.getName();
+        user.address = address;
+        user.birthDay = createUserDto.getBirthDay();
+        user.password = createUserDto.getPassword();
+        user.email = createUserDto.getEmail();
+        user.phone = createUserDto.getPhone();
+        user.gender = createUserDto.getGender();
+        user.status = MemberStatusType.Y;
+        return user;
     }
 
+    public void updateUser(UserDto.UpdateUserDto updateUserDto) {
+        Address address = Address.builder()
+                .zipCode(updateUserDto.getAddress().getZipCode())
+                .address1(updateUserDto.getAddress().getAddress1())
+                .address2(updateUserDto.getAddress().getAddress2())
+                .build();
+        User user = new User();
+        user.address = address;
+        user.password = updateUserDto.getPassword();
+    }
     //== 비지니스 로직 ==//
-    public void changePassword(String password) {
-        this.password = password;
-    }
 
-    public void addRole(Role role){
-        if(!validateDuplicationRole(role)){
+
+    public void addRole(Role role) {
+        if (!validateDuplicationRole(role)) {
             UserRole userRole = UserRole.builder().user(this).role(role).build();
             userRoles.add(userRole);
             role.getUserRole().add(userRole);
         }
     }
-    public void removeRole(Role role){
+
+    public void removeRole(Role role) {
         userRoles.removeIf(s -> s.getUser().getId().equals(this.id) && s.getRole().getId().equals(role.getId()));
     }
-    private boolean validateDuplicationRole(Role role){
+
+    private boolean validateDuplicationRole(Role role) {
         return userRoles.stream().anyMatch(s -> s.getUser().getId().equals(this.id) && s.getRole().getId().equals(role.getId()));
     }
 
