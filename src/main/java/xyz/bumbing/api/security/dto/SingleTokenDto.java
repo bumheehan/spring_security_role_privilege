@@ -7,4 +7,5 @@ public class SingleTokenDto {
 
     private String token;
     private String expiresIn;
+
 }

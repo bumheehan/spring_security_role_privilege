@@ -1,15 +1,9 @@
 package xyz.bumbing.api.config;
 
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import xyz.bumbing.api.security.CustomAccessDeniedHandler;
-import xyz.bumbing.api.security.CustomAuthenticationEntryPoint;
-import xyz.bumbing.api.security.JwtAuthenticationFilter;
-import xyz.bumbing.api.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -17,15 +11,20 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import xyz.bumbing.api.security.CustomAccessDeniedHandler;
+import xyz.bumbing.api.security.CustomAuthenticationEntryPoint;
+import xyz.bumbing.api.security.JwtAuthenticationFilter;
+import xyz.bumbing.api.security.JwtAuthenticationProvider;
 
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
-    private final JwtUtils jwtUtils;
+    private final JwtAuthenticationProvider jwtUtils;
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
@@ -47,10 +46,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterAt(new JwtAuthenticationFilter(this.jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/api/member/test2").authenticated()
-                .antMatchers("/**").permitAll()
-                .antMatchers("/h2-console/**").permitAll();
-
+                .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/api/test/user/config").hasRole("USER")
+                .antMatchers("/api/test/admin/config").hasRole("ADMIN");
     }
 }
 

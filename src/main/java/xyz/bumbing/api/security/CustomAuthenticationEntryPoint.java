@@ -1,13 +1,13 @@
 package xyz.bumbing.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import xyz.bumbing.api.controller.dto.ErrorResponse;
-import xyz.bumbing.api.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import xyz.bumbing.api.controller.dto.ErrorResponse;
+import xyz.bumbing.api.exception.ErrorCode;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +31,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
         log.debug("CustomAuthenticationEntryPoint - start");
+        log.info("#########dd#");
 
 
         //401 응답

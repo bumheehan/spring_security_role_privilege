@@ -45,7 +45,7 @@ public class User extends Base {
     private final Set<UserRole> userRoles = new HashSet<>();
 
     @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Login login;
+    private SignIn signIn;
 
     //== 생성 메서드 == //
     public static User createUser(UserDto.CreateUserDto createUserDto) {
@@ -79,6 +79,14 @@ public class User extends Base {
 
     //== 비지니스 로직 ==//
 
+    public void disable() {
+        this.status = MemberStatusType.N;
+    }
+
+    public void enable() {
+        this.status = MemberStatusType.Y;
+    }
+
     //== 연관관계 편의 메서드 ==//
     public void addRole(Role role) {
         if (findUserRole(role).isEmpty()) {
@@ -90,7 +98,7 @@ public class User extends Base {
 
     public void removeRole(Role role) {
         Optional<UserRole> userRoleOptional = findUserRole(role);
-        if(userRoleOptional.isPresent()){
+        if (userRoleOptional.isPresent()) {
             UserRole userRole = userRoleOptional.get();
             role.getUserRole().remove(userRole); // role table
             userRole.removeRelationship(); // mapping table
@@ -106,16 +114,12 @@ public class User extends Base {
     }
 
     private Optional<UserRole> findUserRole(Role role) {
-        return userRoles.stream().filter(s -> s.getUser().getId().equals(this.id) &&  s.getRole().getId().equals(role.getId())).findAny();
+        return userRoles.stream().filter(s -> s.getUser().getId().equals(this.id) && s.getRole().getId().equals(role.getId())).findAny();
     }
 
-
-    public void disable() {
-        this.status = MemberStatusType.N;
-    }
-
-    public void enable() {
-        this.status = MemberStatusType.Y;
+    public void setSignIn(SignIn signIn) {
+        this.signIn = signIn;
+        signIn.setUser(this);
     }
 
 

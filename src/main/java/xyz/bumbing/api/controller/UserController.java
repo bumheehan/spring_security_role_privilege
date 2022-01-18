@@ -1,18 +1,13 @@
 package xyz.bumbing.api.controller;
 
 
-import xyz.bumbing.api.controller.dto.LoginResponse;
-import xyz.bumbing.api.controller.dto.Response;
-import xyz.bumbing.api.controller.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
+import xyz.bumbing.api.controller.dto.Response;
 import xyz.bumbing.api.service.UserService;
 import xyz.bumbing.domain.dto.AddressDto;
 import xyz.bumbing.domain.dto.UserDto;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -72,13 +67,4 @@ public class UserController implements UserApi {
         return Response.ok(userService.getUser(id));
     }
 
-    @Override
-    public Response<LoginResponse> login(LoginRequest loginRequest, HttpServletRequest request) {
-        return null;
-    }
-
-    @Override
-    public Response<LoginResponse> loginRefresh(LoginRefreshRequest loginRefreshRequest, HttpServletRequest request, Authentication authentication) {
-        return null;
-    }
 }

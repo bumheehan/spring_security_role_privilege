@@ -3,7 +3,6 @@ package xyz.bumbing.api.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import xyz.bumbing.api.controller.dto.Response;
 import xyz.bumbing.api.service.PrivilegeService;
 import xyz.bumbing.api.service.RoleService;
 import xyz.bumbing.api.service.UserService;
@@ -38,6 +37,7 @@ public class InitDb {
         private final UserService userService;
 
         private List<Long> initPrivilegeIds = new ArrayList<>();
+
         public void initPrivilege() {
             initPrivilegeIds.add(privilegeService.create("READ_BOARD").getId());
             initPrivilegeIds.add(privilegeService.create("READ_USER").getId());
@@ -47,15 +47,15 @@ public class InitDb {
         }
 
         public void initRole() {
-            roleService.create("ROLE_USER",List.of(initPrivilegeIds.get(0),initPrivilegeIds.get(1)));
-            roleService.create("ROLE_ADMIN",initPrivilegeIds);
+            roleService.create("ROLE_USER", List.of(initPrivilegeIds.get(0), initPrivilegeIds.get(1)));
+            roleService.create("ROLE_ADMIN", initPrivilegeIds);
         }
 
-        public void initUser(){
+        public void initUser() {
             UserDto.CreateUserDto createUserDto = new UserDto.CreateUserDto();
-            createUserDto.setPassword("asd!@#123a");
-            createUserDto.setBirthDay(LocalDate.of(1990,01,01));
-            createUserDto.setEmail("asd@asd.asd");
+            createUserDto.setPassword("test");
+            createUserDto.setBirthDay(LocalDate.of(1990, 01, 01));
+            createUserDto.setEmail("user@a.a");
             createUserDto.setGender(GenderType.M);
             createUserDto.setPhone("010-000-0000");
             createUserDto.setName("test");
@@ -67,13 +67,27 @@ public class InitDb {
 
             createUserDto.setAddress(addressDto);
             UserDto userDto = userService.create(createUserDto);
-
-            userService.removeRole(userDto.getId(),"ROLE_USER");
-
-//            userService.addRole(userDto.getId(),"ROLE_ADMIN");
-
         }
 
+        public void initAdmin() {
+            UserDto.CreateUserDto createUserDto = new UserDto.CreateUserDto();
+            createUserDto.setPassword("test");
+            createUserDto.setBirthDay(LocalDate.of(1990, 01, 01));
+            createUserDto.setEmail("admin@a.a");
+            createUserDto.setGender(GenderType.M);
+            createUserDto.setPhone("010-000-0000");
+            createUserDto.setName("test");
+
+            AddressDto addressDto = new AddressDto();
+            addressDto.setAddress1("seoul");
+            addressDto.setAddress2("seocho");
+            addressDto.setZipCode("12345");
+
+            createUserDto.setAddress(addressDto);
+            UserDto userDto = userService.create(createUserDto);
+            userService.removeRole(userDto.getId(), "ROLE_USER");
+            userService.addRole(userDto.getId(), "ROLE_ADMIN");
+        }
 
     }
 

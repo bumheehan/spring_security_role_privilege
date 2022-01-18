@@ -49,5 +49,15 @@ app:
     refresh-expired: 604800
 
 
-# Register P6LogFactory to log JDBC events
+# oauth2
+security:
+  oauth2:
+    client:
+      client-id: user-api # 앱 id
+      client-secret: abcdefg # 앱 비밀번호
+    resource:
+      jwt:
+        key-value: abcdefg # 토큰 시크릿키
+
+    # Register P6LogFactory to log JDBC events
 decorator.datasource.p6spy.enable-logging: true
