@@ -1,39 +1,55 @@
 package xyz.bumbing.api.security;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Slf4j
-@RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    private static final String TOKEN_TYPE = "Bearer";
+    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher("/api/token",
+            "POST");
 
-    private final JwtAuthenticationProvider jwtProvider;
+    private final ObjectMapper om;
+
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, ObjectMapper om) {
+        super(DEFAULT_ANT_PATH_REQUEST_MATCHER, authenticationManager);
+        setAuthenticationSuccessHandler(new CustomAuthenticationSuccessHandler(om));
+        setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler(om));
+        this.om = om;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (token != null) {
-            if (token.startsWith(TOKEN_TYPE)) {
-                try {
-                    Authentication authentication = jwtProvider.getAuthenticationByAccessToken(token.substring(7));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } catch (Exception e) {
-                    log.error("jwt parse error : " + token, e);
-                }
-            }
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+            throws AuthenticationException {
+        log.debug("attemptAuthentication");
+        try {
+            LoginRequest loginRequest = om.readValue(request.getInputStream(), LoginRequest.class);
+            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
+            return this.getAuthenticationManager().authenticate(authRequest);
+        } catch (IOException e) {
+            throw new UsernameNotFoundException("invalid input variable", e);
         }
-        this.doFilter(request, response, filterChain);
+    }
+
+    @Data
+    static class LoginRequest {
+
+        private String email;
+        private String password;
+
     }
 }
+
+

@@ -61,3 +61,6 @@ security:
 
     # Register P6LogFactory to log JDBC events
 decorator.datasource.p6spy.enable-logging: true
+logging:
+  level:
+    xyz.bumbing: debug

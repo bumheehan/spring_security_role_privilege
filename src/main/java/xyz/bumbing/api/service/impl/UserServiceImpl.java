@@ -1,7 +1,6 @@
 package xyz.bumbing.api.service.impl;//package kr.co.everex.mora.auth.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.bumbing.api.exception.ErrorCode;
@@ -10,7 +9,6 @@ import xyz.bumbing.api.service.UserService;
 import xyz.bumbing.domain.dto.UserDto;
 import xyz.bumbing.domain.entity.Role;
 import xyz.bumbing.domain.entity.User;
-import xyz.bumbing.domain.entity.UserRole;
 import xyz.bumbing.domain.repo.RoleRepository;
 import xyz.bumbing.domain.repo.UserRepository;
 
@@ -23,15 +21,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public UserDto create(UserDto.CreateUserDto createUserDto) {
 
         validateUser(createUserDto.getEmail());
-
-        createUserDto.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
 
         User user = User.createUser(createUserDto);
 
@@ -45,7 +40,7 @@ public class UserServiceImpl implements UserService {
 
     private void validateUser(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
-        if(userOptional.isPresent()){
+        if (userOptional.isPresent()) {
             throw new UserException(ErrorCode.DUPLICATION);
         }
     }
@@ -54,8 +49,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto update(Long id, UserDto.UpdateUserDto updateUserDto) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserException(ErrorCode.ENTITY_NOT_FOUND));
-
-        updateUserDto.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
 
         user.updateUser(updateUserDto);
 

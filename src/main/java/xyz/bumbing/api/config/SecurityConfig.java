@@ -1,8 +1,10 @@
 package xyz.bumbing.api.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,10 +13,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import xyz.bumbing.api.security.CustomAccessDeniedHandler;
-import xyz.bumbing.api.security.CustomAuthenticationEntryPoint;
-import xyz.bumbing.api.security.JwtAuthenticationFilter;
-import xyz.bumbing.api.security.JwtAuthenticationProvider;
+import xyz.bumbing.api.security.*;
+import xyz.bumbing.api.service.impl.UserDetailsServiceImpl;
+import xyz.bumbing.domain.repo.UserRepository;
 
 @EnableWebSecurity
 @Configuration
@@ -25,10 +26,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final JwtAuthenticationProvider jwtUtils;
+    private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        super.configure(auth);
+        auth.userDetailsService(new UserDetailsServiceImpl(userRepository));
     }
 
     @Override
@@ -44,7 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling().authenticationEntryPoint(this.customAuthenticationEntryPoint).accessDeniedHandler(this.customAccessDeniedHandler)
                 .and()
-                .addFilterAt(new JwtAuthenticationFilter(this.jwtUtils), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthorizationFilter(this.jwtUtils), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(new JwtAuthenticationFilter(authenticationManager(), objectMapper), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/api/test/user/config").hasRole("USER")

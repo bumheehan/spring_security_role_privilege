@@ -1,6 +1,7 @@
 package xyz.bumbing.api.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.bumbing.api.service.PrivilegeService;
@@ -25,6 +26,7 @@ public class InitDb {
         initService.initPrivilege();
         initService.initRole();
         initService.initUser();
+        initService.initAdmin();
     }
 
     @Component
@@ -35,8 +37,9 @@ public class InitDb {
         private final RoleService roleService;
         private final PrivilegeService privilegeService;
         private final UserService userService;
+        private final PasswordEncoder passwordEncoder;
 
-        private List<Long> initPrivilegeIds = new ArrayList<>();
+        private final List<Long> initPrivilegeIds = new ArrayList<>();
 
         public void initPrivilege() {
             initPrivilegeIds.add(privilegeService.create("READ_BOARD").getId());
@@ -47,18 +50,18 @@ public class InitDb {
         }
 
         public void initRole() {
-            roleService.create("ROLE_USER", List.of(initPrivilegeIds.get(0), initPrivilegeIds.get(1)));
+            roleService.create("ROLE_USER", List.of(initPrivilegeIds.get(0), initPrivilegeIds.get(2)));
             roleService.create("ROLE_ADMIN", initPrivilegeIds);
         }
 
         public void initUser() {
             UserDto.CreateUserDto createUserDto = new UserDto.CreateUserDto();
-            createUserDto.setPassword("test");
+            createUserDto.setPassword(passwordEncoder.encode("user"));
             createUserDto.setBirthDay(LocalDate.of(1990, 01, 01));
-            createUserDto.setEmail("user@a.a");
+            createUserDto.setEmail("user@google.com");
             createUserDto.setGender(GenderType.M);
             createUserDto.setPhone("010-000-0000");
-            createUserDto.setName("test");
+            createUserDto.setName("Han");
 
             AddressDto addressDto = new AddressDto();
             addressDto.setAddress1("seoul");
@@ -71,12 +74,12 @@ public class InitDb {
 
         public void initAdmin() {
             UserDto.CreateUserDto createUserDto = new UserDto.CreateUserDto();
-            createUserDto.setPassword("test");
-            createUserDto.setBirthDay(LocalDate.of(1990, 01, 01));
-            createUserDto.setEmail("admin@a.a");
-            createUserDto.setGender(GenderType.M);
+            createUserDto.setPassword(passwordEncoder.encode("admin"));
+            createUserDto.setBirthDay(LocalDate.of(1993, 01, 01));
+            createUserDto.setEmail("admin@google.com");
+            createUserDto.setGender(GenderType.F);
             createUserDto.setPhone("010-000-0000");
-            createUserDto.setName("test");
+            createUserDto.setName("Bing");
 
             AddressDto addressDto = new AddressDto();
             addressDto.setAddress1("seoul");
@@ -85,7 +88,7 @@ public class InitDb {
 
             createUserDto.setAddress(addressDto);
             UserDto userDto = userService.create(createUserDto);
-            userService.removeRole(userDto.getId(), "ROLE_USER");
+//            userService.removeRole(userDto.getId(), "ROLE_USER");
             userService.addRole(userDto.getId(), "ROLE_ADMIN");
         }
 
